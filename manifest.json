@@ -1,0 +1,15 @@
+{
+  "short_name": "dsptool",
+  "name": "戴森球计划量化计算器",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4b4e56",
+  "background_color": "#1e2938"
+}
