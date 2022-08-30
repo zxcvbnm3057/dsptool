@@ -1,5 +1,9 @@
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import UploadIcon from '@mui/icons-material/Upload';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import Drawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
@@ -7,18 +11,13 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import * as React from 'react';
-import factoryData from '../data.json';
-import Cell from './Cell';
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { globalSettingChanged } from '../dataStore';
+import factoryData from '../data.json';
+import { globalSettingChanged, resetRequireData } from '../dataStore';
+import Cell from './Cell';
 import Detail from './Detail';
-import SaveDialog from './SaveDialog';
 import LoadDialog from './LoadDialog';
-
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import UploadIcon from '@mui/icons-material/Upload';
+import SaveDialog from './SaveDialog';
 // import SettingsIcon from '@mui/icons-material/Settings';
 
 
@@ -116,8 +115,8 @@ const Requestions = () => {
                     },
                 }
             })}>
-                <Grid container pl="20px" spacing={2} color="white" width="780px">
-                    <Grid item xs={2}>
+                <Grid container pl="20px" spacing={2} color="white" width="780px" alignItems={'flex-end'}>
+                    <Grid item xs="auto">
                         <Typography>计算方式：</Typography>
                         <ToggleButton
                             selected={true}
@@ -128,7 +127,7 @@ const Requestions = () => {
                             {globalSetting.unitInSecond ? "每秒" : "每分"}
                         </ToggleButton>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid item xs="auto">
                         <Typography>取整方式：</Typography>
                         <ToggleButtonGroup
                             value={globalSetting.r}
@@ -142,7 +141,7 @@ const Requestions = () => {
                             <ToggleButton value={3}>向上取整</ToggleButton>
                         </ToggleButtonGroup>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid item xs="auto">
                         <Typography>增产剂等级：</Typography>
                         <ToggleButtonGroup
                             value={globalSetting.pl}
@@ -157,7 +156,16 @@ const Requestions = () => {
                             <ToggleButton value={4}>MK.Ⅲ</ToggleButton>
                         </ToggleButtonGroup>
                     </Grid>
-
+                    <Grid item xs="auto">
+                        <ToggleButton
+                            selected={false}
+                            onChange={() => {
+                                dispatch(resetRequireData());
+                            }}
+                            sx={{ width: "70px" }}>
+                            重置
+                        </ToggleButton>
+                    </Grid>
                 </Grid>
             </ThemeProvider>
 

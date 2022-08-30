@@ -1,7 +1,9 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit'
-import factoryData from './data.json'
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
+import factoryData from './data.json'
+
+
 // redux cant handle non-serializable data in state or actions
 
 function addRecipes(recipeData) {
@@ -10,18 +12,19 @@ function addRecipes(recipeData) {
       n: product number
       t: produce time
       m: machine
-      e: can get extra product
+      e: can not get extra product
   */
   return {
     i: recipeData.i || {},
     n: recipeData.n || 1,
     t: recipeData.t || 1,
     m: recipeData.m,
-    e: recipeData.e || true,
+    e: recipeData.e || false,
   }
 }
 
 // 0 is bool "false" in JS so count from 1 to using Boolean calculation
+// all of the number is count in second
 
 function addRequire() {
   /* 
@@ -180,11 +183,17 @@ export const calculatorSlice = createSlice({
       delete state.saveData[action.payload];
       return state;
     },
+    resetRequireData: (state) => {
+      for (const item in state.requireData) {
+        if (state.requireData[item].n)
+          calculate(state, item, 0);
+      }
+    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { globalSettingChanged, numberChanged, recipeChanged, roundMethodChanged, factoryLevelChanged, proliferatorLevelChanged, proliferatorEffectChanged, saveRequireData, loadRequireData, deleteRequireData } = calculatorSlice.actions
+export const { globalSettingChanged, numberChanged, recipeChanged, roundMethodChanged, factoryLevelChanged, proliferatorLevelChanged, proliferatorEffectChanged, saveRequireData, loadRequireData, deleteRequireData, resetRequireData } = calculatorSlice.actions
 
 const persistConfig = {
   key: 'data',

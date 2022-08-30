@@ -1,20 +1,17 @@
+import G6 from '@antv/g6';
+import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import * as React from 'react';
-import ReactDOM from 'react-dom';
-
-import { Box, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-
+import * as React from 'react';
+import ReactDOM from 'react-dom';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { factoryLevelChanged, numberChanged, proliferatorEffectChanged, proliferatorLevelChanged, recipeChanged, roundMethodChanged } from '../dataStore';
-
-import G6 from '@antv/g6';
-
+import { roundToFix2, unitsConversion } from '../utils/calculateUtil';
 
 const Detail = ({ name }) => {
     const dispatch = useDispatch()
@@ -69,13 +66,13 @@ const Detail = ({ name }) => {
     React.useEffect(() => {
         if (graph) {
             var i = 1;
-            var children = [{ id: String(i++), img: "./static/images/" + name + ".png", label: String((requireData.n + requireData.s) * (globalSetting.unitInSecond ? 1 : 60)) }];
+            var children = [{ id: String(i++), img: "./static/images/" + name + ".png", label: String(roundToFix2(unitsConversion(requireData.n + requireData.s, globalSetting))) }];
             for (const cargo in requireData.c) {
                 if (requireData.c[cargo])
-                    children.push({ id: String(i++), img: "./static/images/" + cargo + ".png", label: String(requireData.c[cargo] * (globalSetting.unitInSecond ? 1 : 60)) });
+                    children.push({ id: String(i++), img: "./static/images/" + cargo + ".png", label: String(roundToFix2(unitsConversion(requireData.c[cargo], globalSetting))) });
             }
             graph.clear();
-            graph.read({ id: '0', img: "./static/images/" + name + ".png", label: String((requireData.t + requireData.s) * (globalSetting.unitInSecond ? 1 : 60)), labelCfg: { position: 'top' }, children: children });
+            graph.read({ id: '0', img: "./static/images/" + name + ".png", label: String(roundToFix2(unitsConversion(requireData.t + requireData.s, globalSetting))), labelCfg: { position: 'top' }, children: children });
         }
     })
 
@@ -135,7 +132,7 @@ const Detail = ({ name }) => {
                 <Grid container spacing={2} color="white">
                     <Grid item xs={4}>
                         <Typography>需求：</Typography>
-                        <TextField key={name} type="number" size="small" defaultValue={requireData.n * (globalSetting.unitInSecond ? 1 : 60) || ''}
+                        <TextField key={name} type="number" size="small" defaultValue={unitsConversion(requireData.n, globalSetting) || ''}
                             sx={{
                                 "input::-webkit-inner-spin-button": {
                                     "-webkit-appearance": "none"
@@ -155,9 +152,9 @@ const Detail = ({ name }) => {
                                     dispatch(factoryLevelChanged({ name: name, value: newValue }));
                                 }
                             }}>
-                            <ToggleButton value={1}>MK.Ⅰ</ToggleButton>
-                            <ToggleButton value={2} disabled={!["冶炼设备", "制造台"].includes(recipeData[requireData.i].m)}>MK.Ⅱ</ToggleButton>
-                            <ToggleButton value={3} disabled={!["制造台"].includes(recipeData[requireData.i].m)}>MK.Ⅲ</ToggleButton>
+                            <ToggleButton value={1}>Mk.Ⅰ</ToggleButton>
+                            <ToggleButton value={2} disabled={!["冶炼设备", "制造台"].includes(recipeData[requireData.i].m)}>Mk.Ⅱ</ToggleButton>
+                            <ToggleButton value={3} disabled={!["制造台"].includes(recipeData[requireData.i].m)}>Mk.Ⅲ</ToggleButton>
                         </ToggleButtonGroup>
                     </Grid>
                     <Grid item xs={4}>
@@ -170,7 +167,7 @@ const Detail = ({ name }) => {
                                 }
                             }}>
                             <ToggleButton value={1}>加速</ToggleButton>
-                            <ToggleButton value={2} disabled={!recipeData[requireData.i].e}>增产</ToggleButton>
+                            <ToggleButton value={2} disabled={recipeData[requireData.i].e}>增产</ToggleButton>
                         </ToggleButtonGroup>
                     </Grid>
                     <Grid item xs={6}>
