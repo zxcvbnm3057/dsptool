@@ -23,18 +23,9 @@ import { roundToFix2, unitsConversion } from "../utils/calculateUtil";
 const Detail = ({ name }) => {
   const dispatch = useDispatch();
 
-  const recipeData = useSelector(
-    (state) => state.recipeData?.[name] ?? [],
-    shallowEqual
-  );
-  const requireData = useSelector(
-    (state) => state.requireData?.[name] ?? {},
-    shallowEqual
-  );
-  const globalSetting = useSelector(
-    (state) => state.globalSetting,
-    shallowEqual
-  );
+  const recipeData = useSelector((state) => state.recipeData?.[name] ?? [], shallowEqual);
+  const requireData = useSelector((state) => state.requireData?.[name] ?? {}, shallowEqual);
+  const globalSetting = useSelector((state) => state.globalSetting, shallowEqual);
 
   const ref = React.useRef(null);
   const [graph, setGraph] = React.useState(null);
@@ -88,11 +79,7 @@ const Detail = ({ name }) => {
         {
           id: String(i++),
           img: "./static/images/" + name + ".png",
-          label: String(
-            roundToFix2(
-              unitsConversion(requireData.n + requireData.s, globalSetting)
-            )
-          ),
+          label: String(roundToFix2(unitsConversion(requireData.n + requireData.s, globalSetting))),
         },
       ];
       for (const cargo in requireData.c) {
@@ -100,20 +87,14 @@ const Detail = ({ name }) => {
           children.push({
             id: String(i++),
             img: "./static/images/" + cargo + ".png",
-            label: String(
-              roundToFix2(unitsConversion(requireData.c[cargo], globalSetting))
-            ),
+            label: String(roundToFix2(unitsConversion(requireData.c[cargo], globalSetting))),
           });
       }
       graph.clear();
       graph.read({
         id: "0",
         img: "./static/images/" + name + ".png",
-        label: String(
-          roundToFix2(
-            unitsConversion(requireData.t + requireData.s, globalSetting)
-          )
-        ),
+        label: String(roundToFix2(unitsConversion(requireData.t + requireData.s, globalSetting))),
         labelCfg: { position: "top" },
         children: children,
       });
@@ -121,12 +102,7 @@ const Detail = ({ name }) => {
   });
 
   return (
-    <Stack
-      direction='column'
-      justifyContent='center'
-      alignItems='center'
-      spacing={4}
-      sx={{ width: "600px" }}>
+    <Stack direction='column' justifyContent='center' alignItems='center' spacing={4} sx={{ width: "600px" }}>
       <ThemeProvider
         theme={createTheme({
           palette: {
@@ -190,18 +166,14 @@ const Detail = ({ name }) => {
               }}
               InputProps={{
                 endAdornment: (
-                  <InputAdornment position='end'>
-                    {"个/" + (globalSetting.unitInSecond ? "s" : "min")}
-                  </InputAdornment>
+                  <InputAdornment position='end'>{"个/" + (globalSetting.unitInSecond ? "s" : "min")}</InputAdornment>
                 ),
               }}
               onBlur={(event) => {
                 dispatch(
                   numberChanged({
                     name: name,
-                    number:
-                      parseInt(event.target.value || 0) /
-                      (globalSetting.unitInSecond ? 1 : 60),
+                    number: parseInt(event.target.value || 0) / (globalSetting.unitInSecond ? 1 : 60),
                   })
                 );
               }}
@@ -213,22 +185,14 @@ const Detail = ({ name }) => {
               value={requireData.fl}
               onChange={(event, newValue) => {
                 if (null != newValue) {
-                  dispatch(
-                    factoryLevelChanged({ name: name, value: newValue })
-                  );
+                  dispatch(factoryLevelChanged({ name: name, value: newValue }));
                 }
               }}>
               <ToggleButton value={1}>Mk.Ⅰ</ToggleButton>
-              <ToggleButton
-                value={2}
-                disabled={
-                  !["冶炼设备", "制造台"].includes(recipeData[requireData.i].m)
-                }>
+              <ToggleButton value={2} disabled={!["冶炼设备", "制造台"].includes(recipeData[requireData.i].m)}>
                 Mk.Ⅱ
               </ToggleButton>
-              <ToggleButton
-                value={3}
-                disabled={!["制造台"].includes(recipeData[requireData.i].m)}>
+              <ToggleButton value={3} disabled={!["制造台"].includes(recipeData[requireData.i].m)}>
                 Mk.Ⅲ
               </ToggleButton>
             </ToggleButtonGroup>
@@ -239,9 +203,7 @@ const Detail = ({ name }) => {
               value={requireData.pe}
               onChange={(event, newValue) => {
                 if (null != newValue) {
-                  dispatch(
-                    proliferatorEffectChanged({ name: name, value: newValue })
-                  );
+                  dispatch(proliferatorEffectChanged({ name: name, value: newValue }));
                 }
               }}>
               <ToggleButton value={1}>加速</ToggleButton>
@@ -270,9 +232,7 @@ const Detail = ({ name }) => {
               value={requireData.pl || globalSetting.pl}
               onChange={(event, newValue) => {
                 if (null != newValue) {
-                  dispatch(
-                    proliferatorLevelChanged({ name: name, value: newValue })
-                  );
+                  dispatch(proliferatorLevelChanged({ name: name, value: newValue }));
                 }
               }}>
               <ToggleButton value={1}>不使用</ToggleButton>
@@ -283,12 +243,7 @@ const Detail = ({ name }) => {
           </Grid>
         </Grid>
       </ThemeProvider>
-      <Stack
-        direction='column'
-        justifyContent='center'
-        alignItems='center'
-        color='white'
-        width='500px'>
+      <Stack direction='column' justifyContent='center' alignItems='center' color='white' width='500px'>
         {recipeData.map((recipe, id) => {
           return (
             <Box
@@ -299,9 +254,7 @@ const Detail = ({ name }) => {
               bgcolor={requireData.i === id ? "#243b5c" : "transparent"}
               p={"5px"}
               sx={{ border: "2px solid #7d7d7d !important", width: "100%" }}
-              onClick={() =>
-                dispatch(recipeChanged({ name: name, value: id }))
-              }>
+              onClick={() => dispatch(recipeChanged({ name: name, value: id }))}>
               {Object.keys(recipe.i).map((key) => (
                 <>
                   <img alt={key} src={"./static/images/" + key + ".png"} />
@@ -309,23 +262,10 @@ const Detail = ({ name }) => {
                 </>
               ))}
               <svg height='100%' viewBox='0 0 80 65'>
-                <text
-                  x='35'
-                  y='35'
-                  font-size='30'
-                  fill='#fff'
-                  style={{ "text-anchor": "middle" }}>
+                <text x='35' y='35' font-size='30' fill='#fff' style={{ "text-anchor": "middle" }}>
                   {recipe.t}s
                 </text>
-                <line
-                  x1='5'
-                  y1='44'
-                  x2='65'
-                  y2='44'
-                  stroke='#fff'
-                  stroke-width='2'
-                  marker-end='url(#arrow)'
-                />
+                <line x1='5' y1='44' x2='65' y2='44' stroke='#fff' stroke-width='2' marker-end='url(#arrow)' />
                 <path d='M65,50 L65,38 L83,44 z' fill='#fff' />
               </svg>
               <img alt={name} src={"./static/images/" + name + ".png"} />

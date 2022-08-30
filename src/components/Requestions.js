@@ -22,10 +22,7 @@ import SaveDialog from "./SaveDialog";
 
 const Requestions = () => {
   const dispatch = useDispatch();
-  const globalSetting = useSelector(
-    (state) => state.globalSetting,
-    shallowEqual
-  );
+  const globalSetting = useSelector((state) => state.globalSetting, shallowEqual);
 
   const [key, setKey] = React.useState("组件");
   const [item, setItem] = React.useState();
@@ -35,10 +32,7 @@ const Requestions = () => {
   const [loadDialogOpen, setLoadDialogOpen] = React.useState(false);
 
   const toggleDrawer = (open) => (event) => {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
+    if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
       return;
     }
     setDrawerState(open);
@@ -82,11 +76,7 @@ const Requestions = () => {
   return (
     <>
       <Box color='white' p='20px' sx={{ width: "fit-content" }}>
-        <Box
-          width='100%'
-          display='inline-flex'
-          justifyContent='space-between'
-          alignItems='center'>
+        <Box width='100%' display='inline-flex' justifyContent='space-between' alignItems='center'>
           <ToggleButtonGroup
             exclusive
             value={key}
@@ -135,9 +125,7 @@ const Requestions = () => {
             }}
           />
         </Box>
-        <Stack sx={{ border: "1px solid black", width: "fit-content" }}>
-          {children[key]}
-        </Stack>
+        <Stack sx={{ border: "1px solid black", width: "fit-content" }}>{children[key]}</Stack>
       </Box>
 
       <ThemeProvider
@@ -168,13 +156,7 @@ const Requestions = () => {
             },
           },
         })}>
-        <Grid
-          container
-          pl='20px'
-          spacing={2}
-          color='white'
-          width='780px'
-          alignItems={"flex-end"}>
+        <Grid container pl='20px' spacing={2} color='white' width='780px' alignItems={"flex-end"}>
           <Grid item xs='auto'>
             <Typography>计算方式：</Typography>
             <ToggleButton
