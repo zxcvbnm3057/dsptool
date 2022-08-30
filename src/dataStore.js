@@ -1,8 +1,7 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit'
-import { persistReducer, persistStore } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
-import factoryData from './data.json'
-
+import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import factoryData from "./data.json";
 
 // redux cant handle non-serializable data in state or actions
 
@@ -20,7 +19,7 @@ function addRecipes(recipeData) {
     t: recipeData.t || 1,
     m: recipeData.m,
     e: recipeData.e || false,
-  }
+  };
 }
 
 // 0 is bool "false" in JS so count from 1 to using Boolean calculation
@@ -57,7 +56,7 @@ function addRequire() {
     s: 0,
     c: {},
     i: 0,
-  }
+  };
 }
 
 function calculate(state, name, number, source) {
@@ -77,7 +76,10 @@ function calculate(state, name, number, source) {
     requireData.t += requireData.c[c];
   }
 
-  requireData.m = requireData.t / recipeData.n * recipeData.t / (state.factoryData.speed[recipeData.m]?.[requireData.fl] ?? 1) / state.factoryData.proliferator[requireData.pl || state.globalSetting.pl][requireData.pe];
+  requireData.m =
+    ((requireData.t / recipeData.n) * recipeData.t) /
+    (state.factoryData.speed[recipeData.m]?.[requireData.fl] ?? 1) /
+    state.factoryData.proliferator[requireData.pl || state.globalSetting.pl][requireData.pe];
 
   switch (requireData.r || state.globalSetting.r) {
     case 1:
@@ -90,23 +92,35 @@ function calculate(state, name, number, source) {
       break;
   }
 
-  requireData.s = requireData.m * (state.factoryData.speed[recipeData.m]?.[requireData.fl] ?? 1) * state.factoryData.proliferator[requireData.pl || state.globalSetting.pl][requireData.pe] * recipeData.n / recipeData.t - requireData.t
+  requireData.s =
+    (requireData.m *
+      (state.factoryData.speed[recipeData.m]?.[requireData.fl] ?? 1) *
+      state.factoryData.proliferator[requireData.pl || state.globalSetting.pl][requireData.pe] *
+      recipeData.n) /
+      recipeData.t -
+    requireData.t;
 
   for (const ingredient in recipeData.i) {
-    calculate(state, ingredient, recipeData.i[ingredient] * requireData.t / state.factoryData.proliferator[requireData.pl || state.globalSetting.pl][requireData.pe], name);
+    calculate(
+      state,
+      ingredient,
+      (recipeData.i[ingredient] * requireData.t) /
+        state.factoryData.proliferator[requireData.pl || state.globalSetting.pl][requireData.pe],
+      name
+    );
   }
 }
 
 export const calculatorSlice = createSlice({
-  name: 'counter',
+  name: "counter",
   initialState: () => {
-    var recipeData = {}
-    var requireData = {}
+    var recipeData = {};
+    var requireData = {};
     for (const product in factoryData.recipes) {
       if (Object.hasOwnProperty.call(factoryData.recipes, product)) {
-        recipeData[product] = []
+        recipeData[product] = [];
         for (const recipe of factoryData.recipes[product]) {
-          recipeData[product].push(addRecipes(recipe))
+          recipeData[product].push(addRecipes(recipe));
         }
         requireData[product] = addRequire();
       }
@@ -120,15 +134,14 @@ export const calculatorSlice = createSlice({
       recipeData: recipeData,
       requireData: requireData,
       factoryData: factoryData.factory,
-      saveData: {}
+      saveData: {},
     };
   },
   reducers: {
     globalSettingChanged: (state, action) => {
-      state.globalSetting = { ...state.globalSetting, ...action.payload }
+      state.globalSetting = { ...state.globalSetting, ...action.payload };
       for (const item in state.requireData) {
-        if (state.requireData[item].n)
-          calculate(state, item, state.requireData[item].n);
+        if (state.requireData[item].n) calculate(state, item, state.requireData[item].n);
       }
     },
     numberChanged: (state, action) => {
@@ -165,18 +178,19 @@ export const calculatorSlice = createSlice({
     },
     proliferatorEffectChanged: (state, action) => {
       let { name, value } = action.payload;
-      state.requireData[name].pe = value; calculate(state, name);
+      state.requireData[name].pe = value;
+      calculate(state, name);
       return state;
     },
     saveRequireData: (state, action) => {
       state.saveData[action.payload] = {
         globalSetting: state.globalSetting,
-        requireData: state.requireData
-      }
+        requireData: state.requireData,
+      };
       return state;
     },
     loadRequireData: (state, action) => {
-      state = { ...state, ...state.saveData[action.payload] }
+      state = { ...state, ...state.saveData[action.payload] };
       return state;
     },
     deleteRequireData: (state, action) => {
@@ -185,25 +199,36 @@ export const calculatorSlice = createSlice({
     },
     resetRequireData: (state) => {
       for (const item in state.requireData) {
-        if (state.requireData[item].n)
-          calculate(state, item, 0);
+        if (state.requireData[item].n) calculate(state, item, 0);
       }
-    }
+    },
   },
-})
+});
 
 // Action creators are generated for each case reducer function
-export const { globalSettingChanged, numberChanged, recipeChanged, roundMethodChanged, factoryLevelChanged, proliferatorLevelChanged, proliferatorEffectChanged, saveRequireData, loadRequireData, deleteRequireData, resetRequireData } = calculatorSlice.actions
+export const {
+  globalSettingChanged,
+  numberChanged,
+  recipeChanged,
+  roundMethodChanged,
+  factoryLevelChanged,
+  proliferatorLevelChanged,
+  proliferatorEffectChanged,
+  saveRequireData,
+  loadRequireData,
+  deleteRequireData,
+  resetRequireData,
+} = calculatorSlice.actions;
 
 const persistConfig = {
-  key: 'data',
+  key: "data",
   storage,
-  whitelist: ['saveData']
-}
+  whitelist: ["saveData"],
+};
 
-const persistedReducer = persistReducer(persistConfig, calculatorSlice.reducer)
+const persistedReducer = persistReducer(persistConfig, calculatorSlice.reducer);
 let store = configureStore({
   reducer: persistedReducer,
-})
-let persistor = persistStore(store)
-export { store, persistor }
+});
+let persistor = persistStore(store);
+export { store, persistor };
