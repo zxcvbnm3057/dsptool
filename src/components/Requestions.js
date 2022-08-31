@@ -4,6 +4,11 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import Drawer from "@mui/material/Drawer";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
@@ -13,14 +18,18 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import * as React from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import factoryData from "../data.json";
-import { globalSettingChanged, resetRequireData } from "../dataStore";
+import { globalSettingChanged, readRequireData, resetRequireData } from "../dataStore";
 import Cell from "./Cell";
 import Detail from "./Detail";
 import LoadDialog from "./LoadDialog";
 import SaveDialog from "./SaveDialog";
 // import SettingsIcon from '@mui/icons-material/Settings';
+import { Base64 } from "js-base64";
 
-const Requestions = () => {
+const pako = require("pako");
+const queryString = require("query-string");
+
+const Requestions = (props) => {
   const dispatch = useDispatch();
   const globalSetting = useSelector((state) => state.globalSetting, shallowEqual);
 
@@ -30,6 +39,7 @@ const Requestions = () => {
 
   const [saveDialogOpen, setSaveDialogOpen] = React.useState(false);
   const [loadDialogOpen, setLoadDialogOpen] = React.useState(false);
+  const [readDialogOpen, setReadDialogOpen] = React.useState(false);
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
@@ -72,6 +82,16 @@ const Requestions = () => {
       );
     }),
   };
+
+  var schemeQuery = queryString.parse(window.location.search)["scheme"];
+  var scheme = schemeQuery ? JSON.parse(pako.inflateRaw(Base64.toUint8Array(schemeQuery), { to: "string" })) : null;
+
+  React.useEffect(() => {
+    if (scheme) {
+      setReadDialogOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [window.location.search]);
 
   return (
     <>
@@ -227,6 +247,38 @@ const Requestions = () => {
           <Detail name={item} />
         </Box>
       </Drawer>
+
+      {scheme ? (
+        <Dialog
+          open={readDialogOpen}
+          onClose={() => {
+            setReadDialogOpen(false);
+          }}>
+          <DialogTitle id='alert-dialog-title'>{"加载量化方案？"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-description'>{"加载新方案将覆盖未保存的方案，是否确定？"}</DialogContentText>
+            <DialogContentText id='alert-dialog-description'>{"新方案名：" + scheme.name}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setReadDialogOpen(false);
+              }}>
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                dispatch(readRequireData(scheme.data));
+                setReadDialogOpen(false);
+              }}
+              autoFocus>
+              确定
+            </Button>
+          </DialogActions>
+        </Dialog>
+      ) : (
+        <></>
+      )}
     </>
   );
 };

@@ -193,6 +193,10 @@ export const calculatorSlice = createSlice({
       state = { ...state, ...state.saveData[action.payload] };
       return state;
     },
+    readRequireData: (state, action) => {
+      state = { ...state, ...action.payload };
+      return state;
+    },
     deleteRequireData: (state, action) => {
       delete state.saveData[action.payload];
       return state;
@@ -216,6 +220,7 @@ export const {
   proliferatorEffectChanged,
   saveRequireData,
   loadRequireData,
+  readRequireData,
   deleteRequireData,
   resetRequireData,
 } = calculatorSlice.actions;
@@ -223,7 +228,7 @@ export const {
 const persistConfig = {
   key: "data",
   storage,
-  whitelist: ["saveData"],
+  whitelist: ["globalSetting", "requireData", "saveData"],
 };
 
 const persistedReducer = persistReducer(persistConfig, calculatorSlice.reducer);
