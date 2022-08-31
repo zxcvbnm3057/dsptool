@@ -74,6 +74,7 @@ export default function LoadDialog({ open, onClose }) {
           onClick={() => {
             copy(
               window.location.origin +
+                window.location.pathname +
                 "?scheme=" +
                 Base64.fromUint8Array(
                   pako.deflateRaw(JSON.stringify({ name: current, data: saveData[current] }), {
